@@ -1,0 +1,29 @@
+{
+    "name": "kapitchi/process",
+    "description": "Allows to run a process (shell, PHP, ...) while stdout is accessible to other processes. This can be used to run long shell command while updating web page about the progress.",
+    "keywords": [
+        "kapitchi",
+        "zf2",
+    ],
+    "homepage": "http://kapitchi.com",
+    "authors": [
+        {
+            "name": "Matus Zeman",
+            "email": "mz@kapitchi.com",
+            "homepage": "http://kapitchi.com",
+            "role": "Lead developer"
+        }
+    ],
+    "support": {
+        "email": "dev@kapitchi.com"
+    },
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=5.3.3"
+    },
+    "autoload": {
+        "classmap": [
+            "./"
+        ]
+    }
+}
