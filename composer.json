@@ -1,9 +1,9 @@
 {
     "name": "kapitchi/process",
-    "description": "Allows to run a process (shell, PHP, ...) while stdout is accessible to other processes. This can be used to run long shell command while updating web page about the progress.",
+    "description": "Long time execution script updates. Get stdout of long running script from another process!",
     "keywords": [
         "kapitchi",
-        "zf2",
+        "zf2"
     ],
     "homepage": "http://kapitchi.com",
     "authors": [
