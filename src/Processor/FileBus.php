@@ -1,8 +1,8 @@
 <?php
 
-namespace KapitchiProcess\Output;
+namespace KapitchiProcess\Processor;
 
-class FileOutput implements OutputInterface
+class FileBus implements BusInterface
 {
     protected $path;
     
@@ -28,7 +28,7 @@ class FileOutput implements OutputInterface
     }    
     
     protected function getFilePath($pid) {
-        return $this->getPath() . '/' . $pid;
+        return $this->getPath() . '/' . $pid . '.output';
     }
     
     public function getPath() {

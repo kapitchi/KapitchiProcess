@@ -2,18 +2,10 @@
 
 namespace KapitchiProcess;
 
-use Zend\ModuleManager\Manager,
-    Zend\Mvc\ApplicationInterface,
-    Zend\EventManager\Event,
-    KapitchiBase\Module\ModuleAbstract;
+use KapitchiBase\Module\ModuleAbstract;
 
-class Module extends ModuleAbstract {
-
-    public function onBootstrap(Event $e) {
-        parent::onBootstrap($e);
-
-    }
-
+class Module extends ModuleAbstract
+{
     public function getDir() {
         return __DIR__;
     }

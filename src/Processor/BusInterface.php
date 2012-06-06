@@ -1,8 +1,8 @@
 <?php
 
-namespace KapitchiProcess\Output;
+namespace KapitchiProcess\Processor;
 
-interface OutputInterface
+interface BusInterface
 {
     public function writeStdout($pid, $data);
     public function readStdout($pid, $offset = null);

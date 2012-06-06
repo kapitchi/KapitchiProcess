@@ -8,16 +8,33 @@ class FileRegistry implements RegistryInterface
 {
     protected $registryPath;
     
-    public function __construct($registryPath = null) {
+    public function __construct($registryPath = null)
+    {
         if($registryPath !== null) {
             $this->setRegistryPath($registryPath);
         }
     }
+    
+    public function listProcessIds()
+    {
+        $path = $this->getRegistryPath();
+        $files = glob($path . '/*');
+        array_walk($files, function(&$item, $key) use ($path) {
+            $item = str_replace($path . '/', '', $item);
+        });
+        return $files;
+    }
 
+    /**
+     * 
+     * @param type $pid
+     * @return \KapitchiProcess\Process\ProcessInterface
+     * @throws \Exception
+     */
     public function get($pid)
     {
         if(!$this->isRegistered($pid)) {
-            throw new \Exception("Not so easy man! Pid '$pid' does not exist");
+            throw new \Exception("Pid '$pid' does not exist");
         }
         
         $str = file_get_contents($this->getProcessFilePath($pid));
@@ -27,10 +44,10 @@ class FileRegistry implements RegistryInterface
         }
         
         return $process;
-        
     }
     
-    public function isRegistered($pid) {
+    public function isRegistered($pid)
+    {
         return is_readable($this->getProcessFilePath($pid));
     }
     
@@ -38,7 +55,7 @@ class FileRegistry implements RegistryInterface
     {
         $pid = md5(uniqid());
         
-        $process->setPid($pid);
+        $process->setId($pid);
         $process->setRegistered(time());
         
         $str = serialize($process);
@@ -54,10 +71,6 @@ class FileRegistry implements RegistryInterface
         unlink($path);
     }
     
-    protected function getProcessFilePath($pid) {
-        return $this->getRegistryPath() . '/' . $pid;
-    }
-    
     public function getRegistryPath() {
         return $this->registryPath;
     }
@@ -68,6 +81,42 @@ class FileRegistry implements RegistryInterface
         }
         
         $this->registryPath = $registryPath;
+    }
+
+    public function start(ProcessInterface $process) {
+        $pid = $process->getId();
+        if(empty($pid)) {
+            throw new \Exception("No Pid");
+        }
+        
+        if(!$this->isRegistered($pid)) {
+            throw new \Exception("Needs to be registered!");
+        }
+        
+        $process->setStarted(time());
+        
+        $str = serialize($process);
+        file_put_contents($this->getProcessFilePath($pid), $str);
+    }
+    
+    public function finish(ProcessInterface $process) {
+        $pid = $process->getId();
+        if(empty($pid)) {
+            throw new \Exception("No Pid");
+        }
+        
+        if(!$this->isRegistered($pid)) {
+            throw new \Exception("Needs to be registered!");
+        }
+        
+        $process->setFinished(time());
+        
+        $str = serialize($process);
+        file_put_contents($this->getProcessFilePath($pid), $str);
+    }
+    
+    protected function getProcessFilePath($pid) {
+        return $this->getRegistryPath() . '/' . $pid . '.pid';
     }
 
 }
