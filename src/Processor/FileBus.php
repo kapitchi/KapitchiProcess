@@ -17,11 +17,12 @@ class FileBus implements BusInterface
     }
     
     public function readStdout($pid, $offset = null) {
+        $path = $this->getFilePath($pid);
         if($offset === null) {
-            return file_get_contents($this->getFilePath($pid));
+            return file_get_contents($path);
         }
         
-        $handle = fopen($this->getFilePath($pid), 'r');
+        $handle = fopen($path, 'r');
         fseek($handle, $offset);
         $data = fread($handle, 10000);
         return $data;

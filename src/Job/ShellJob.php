@@ -21,18 +21,18 @@ class ShellJob implements JobInterface
             throw new CommandEmptyException("Command is empty");
         }
         
-        passthru($cmd);
-//        $handle = popen($cmd, "r");
-//        if($handle === false) {
-//            throw new \Exception("Problem executing popen($cmd)");
-//        }
-//        
-//        while(!feof($handle)) {
-//            $data = fgets($handle);
-//            $output->writeStdout($data);
-//        }
-//        
-//        pclose($handle);
+        //passthru($cmd);
+        $handle = popen($cmd, "r");
+        if($handle === false) {
+            throw new \Exception("Problem executing popen($cmd)");
+        }
+        
+        while(!feof($handle)) {
+            $data = fgets($handle);
+            $output->writeStdout($data);
+        }
+        
+        pclose($handle);
     }
 
     public function getCommand() {

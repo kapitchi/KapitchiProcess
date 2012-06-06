@@ -65,9 +65,9 @@ class Processor
         
         //http://php.net/manual/en/function.ob-start.php
         //"Prior to PHP 5.4.0, the value 1 was a special case value that set the chunk size to 4096 bytes."
-        ob_start(array($this, 'writeStdoutOutput'), 2);
+        //ob_start(array($this, 'writeStdoutOutput'), 2);
         $job->run($processOutput);
-        ob_end_flush();
+        //ob_end_flush();
         
         $registry->finish($process);
         $this->runningProcess = null;
