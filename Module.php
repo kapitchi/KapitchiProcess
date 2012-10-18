@@ -2,9 +2,9 @@
 
 namespace KapitchiProcess;
 
-use KapitchiBase\Module\ModuleAbstract;
+use KapitchiBase\ModuleManager\AbstractModule;
 
-class Module extends ModuleAbstract
+class Module extends AbstractModule
 {
     public function getDir() {
         return __DIR__;
