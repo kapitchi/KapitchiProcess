@@ -1,5 +1,6 @@
 {
     "name": "kapitchi/process",
+    "license": "LGPL-3.0",
     "description": "Long time execution script updates. Get stdout of long running script from another process!",
     "keywords": [
         "kapitchi",
