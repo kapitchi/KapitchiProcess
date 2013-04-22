@@ -2,7 +2,7 @@
 
 namespace KapitchiProcess\Job;
 
-use KapitchiProcess\ProcessOutput\ProcessOutputInterface;
+use KapitchiProcess\Process\ProcessOutputInterface;
 
 interface JobInterface
 {

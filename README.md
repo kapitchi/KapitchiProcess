@@ -18,9 +18,7 @@ Licence
 Introduction
 ============
 
-Allows to run a process (shell, PHP, ...) while stdout is accessible to other processes.  
-This can be used to run long shell command while updating web page about the progress.
-
+Primary usage of this module is running long time operations "in background" and being able to receive progress updates.
 
 Installation
 ============
@@ -30,28 +28,33 @@ TODO
 Basic Usage
 ===========
 
-Run a job
+1. Register a process/job you want to run - you get a process ID / pid.
 
 ```
-
-$path = 'data/kapitchiprocess';
-$processor = new \KapitchiProcess\Service\Processor();
-$processor->setBus(new \KapitchiProcess\Processor\FileBus($path));
-$processor->setRegistry(new \KapitchiProcess\Registry\FileRegistry($path));
-
-$processor = $this->getProcessor();
-$process = $processor->registerJob(new \KapitchiProcess\Job\ShellJob("ping -n 10 kapitchi.com"));
-$processor->run($process);
-
+$process = $processor->registerJob(new \KapitchiProcess\Job\ShellJob('ping -n 30 kapitchi.com'));
+$pid = $process->getId();
 ```
 
-Get updates
+2. Run a process using separate AJAX request as to get response will take as long as your process will run
 
 ```
-
-$service = new \KapitchiProcess\Service\SequentialBusReader();
-$service->setProcessor($processor);
-$update = $service->readNext($pid);
-
+$processor->run($pid);
 ```
 
+3. Use /process/api/bus-reader/read-next/[pid] (AJAX every 1sec?) to request process updates in JSON format as example below.
+
+_Data_ contains data written by the process after the last update request only.
+
+```
+{
+    processId: "895472f28183dc67d39d9680d93c8e9a",
+    isFinished: false,
+    isStarted: true,
+    startedTime: 1366660603,
+    runningTime: 24,
+    registry: [ ],
+    data: "Reply from 176.74.179.134: bytes=32 time=415ms TTL=38 Reply from 176.74.179.134: bytes=32 time=416ms TTL=38 Reply from 176.74.179.134: bytes=32 time=415ms TTL=38 Reply from 176.74.179.134: bytes=32 time=416ms TTL=38 "
+}
+```
+
+TODO

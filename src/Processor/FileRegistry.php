@@ -6,7 +6,7 @@
  * @license   http://opensource.org/licenses/LGPL-3.0 LGPL 3.0
  */
 
-namespace KapitchiProcess\Registry;
+namespace KapitchiProcess\Processor;
 
 use KapitchiProcess\Process\ProcessInterface;
 
@@ -39,7 +39,7 @@ class FileRegistry implements RegistryInterface
      */
     public function get($pid)
     {
-        if(!$this->isRegistered($pid)) {
+        if(!$this->has($pid)) {
             throw new \Exception("Pid '$pid' does not exist");
         }
         
@@ -52,7 +52,7 @@ class FileRegistry implements RegistryInterface
         return $process;
     }
     
-    public function isRegistered($pid)
+    public function has($pid)
     {
         return is_readable($this->getProcessFilePath($pid));
     }
@@ -64,13 +64,18 @@ class FileRegistry implements RegistryInterface
         $process->setId($pid);
         $process->setRegistered(time());
         
+        $this->store($process);
+    }
+    
+    public function store(ProcessInterface $process)
+    {
         $str = serialize($process);
-        file_put_contents($this->getProcessFilePath($pid), $str);
+        file_put_contents($this->getProcessFilePath($process->getId()), $str);
     }
 
-    public function unregister($pid)
+    public function unregister(ProcessInterface $process)
     {
-        $path = $this->getProcessFilePath($pid);
+        $path = $this->getProcessFilePath($process->getId());
         if(!is_readable($path)) {
             throw new \Exception("Process file '$path' does not exist");
         }
@@ -89,38 +94,6 @@ class FileRegistry implements RegistryInterface
         $this->registryPath = $registryPath;
     }
 
-    public function start(ProcessInterface $process) {
-        $pid = $process->getId();
-        if(empty($pid)) {
-            throw new \Exception("No Pid");
-        }
-        
-        if(!$this->isRegistered($pid)) {
-            throw new \Exception("Needs to be registered!");
-        }
-        
-        $process->setStarted(time());
-        
-        $str = serialize($process);
-        file_put_contents($this->getProcessFilePath($pid), $str);
-    }
-    
-    public function finish(ProcessInterface $process) {
-        $pid = $process->getId();
-        if(empty($pid)) {
-            throw new \Exception("No Pid");
-        }
-        
-        if(!$this->isRegistered($pid)) {
-            throw new \Exception("Needs to be registered!");
-        }
-        
-        $process->setFinished(time());
-        
-        $str = serialize($process);
-        file_put_contents($this->getProcessFilePath($pid), $str);
-    }
-    
     protected function getProcessFilePath($pid) {
         return $this->getRegistryPath() . '/' . $pid . '.pid';
     }

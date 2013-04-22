@@ -1,5 +1,5 @@
 <?php
-namespace KapitchiProcess\ProcessOutput;
+namespace KapitchiProcess\Process;
 
 /**
  * 
@@ -11,4 +11,5 @@ interface ProcessOutputInterface {
      * @param string $data
      */
     public function writeStdout($data);
+    public function setRegistryValue($registry, $value);
 }

@@ -8,10 +8,10 @@
 
 namespace KapitchiProcess\Job;
 
-use KapitchiProcess\ProcessOutput\ProcessOutputInterface,
-    RuntimeException as CommandEmptyException;
+use KapitchiProcess\Process\ProcessOutputInterface;
+use RuntimeException as CommandEmptyException;
 
-class ShellJob implements JobInterface
+class ShellJob implements JobInterface, SerializableJobInterace
 {
     protected $command;
 

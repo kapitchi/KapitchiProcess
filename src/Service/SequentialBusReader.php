@@ -8,45 +8,57 @@
 
 namespace KapitchiProcess\Service;
 
-use Zend\Session\Container as SessionContainer,
-    ZfcBase\Service\ServiceAbstract,
-    KapitchiProcess\Processor\SequentialBusReader as SequentialBusReaderModel;
+use Zend\Session\Container as SessionContainer;
+use KapitchiBase\Service\AbstractService;
+use KapitchiProcess\Process\ProcessInterface;
+use KapitchiProcess\Processor\SequentialBusReader as SequentialBusReaderModel;
+use KapitchiProcess\Processor\Processor;
 
-class SequentialBusReader extends ServiceAbstract
+class SequentialBusReader extends AbstractService
 {
     protected $namespace = __CLASS__;
     protected $processor;
     protected $sessionContainer;
 
+    public function __construct(Processor $processor)
+    {
+        $this->setProcessor($processor);
+    }
+    
     public function readNext($processId) {
-        $reader = $this->get($processId);
-        $data = $reader->readNext();
-        $this->store($reader);
-        
         $registry = $this->getProcessor()->getRegistry();
         $process = $registry->get($processId);
-
+        
+        $reader = $this->getBusReader($process);
+        $data = $reader->readNext();
+        $this->storeBusReader($reader);
+        
         $executionTime = 0;
         $started = $process->getStarted();
         $finished = $process->getFinished();
         if($started) {
-            if(!$finished) {
-                $finished = time();
+            if($finished) {
+                $executionTime = $finished - $started;
             }
-            
-            $executionTime = $finished - $started;
+            else {
+                $executionTime = time() - $started;
+            }
         }
         
         return array(
-            'is_finished' => !empty($finished),
-            'is_started' => !empty($started),
-            'excecution_time' => $executionTime,
+            'processId' => $processId,
+            'isFinished' => !empty($finished),
+            'isStarted' => !empty($started),
+            'startedTime' => $started,
+            'runningTime' => $executionTime,
+            'registry' => $process->getRegistry(),
             'data' => $data,
         );
     }
     
-    public function get($processId)
+    protected function getBusReader(ProcessInterface $process)
     {
+        $processId = $process->getId();
         $session = $this->getSessionContainer();
         $bus = $this->getProcessor()->getBus();
         
@@ -62,7 +74,7 @@ class SequentialBusReader extends ServiceAbstract
         return $busReader;
     }
     
-    public function store(SequentialBusReaderModel $reader)
+    protected function storeBusReader(SequentialBusReaderModel $reader)
     {
         $session = $this->getSessionContainer();
         $processId = $reader->getProcessId();

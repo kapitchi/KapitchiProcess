@@ -6,40 +6,54 @@
  * @license   http://opensource.org/licenses/LGPL-3.0 LGPL 3.0
  */
 
-namespace KapitchiProcess\Service;
+namespace KapitchiProcess\Processor;
 
-use KapitchiBase\Stdlib\Options,
-    KapitchiProcess\Process\ProcessInterface,
-    KapitchiProcess\Process\GenericProcess,
-    KapitchiProcess\Job\JobInterface,
-    KapitchiProcess\ProcessOutput\GenericProcessOutput;
+use KapitchiProcess\Process\ProcessInterface;
+use KapitchiProcess\Process\GenericProcess;
+use KapitchiProcess\Job\JobInterface;
+use KapitchiProcess\Job\SerializableJobInterace;
+use KapitchiProcess\Job\Manager as JobManager;
+use KapitchiProcess\Process\GenericProcessOutput;
 
 class Processor
 {
     protected $bus;
     protected $registry;
+    protected $jobManager;
     protected $maxExecutionTime;
     protected $runningProcess;
     
-    public function __construct($options = null)
+    public function __construct(RegistryInterface $registry, BusInterface $bus, JobManager $jobManager)
     {
-        if($options instanceof Options) {
-            $this->setRegistry($options->getRegistry());
-            $this->setBus($options->getBus());
-        }
+        $this->setRegistry($registry);
+        $this->setBus($bus);
+        $this->setJobManager($jobManager);
     }
     
-    public function registerJob(JobInterface $job) {
-        $process = new GenericProcess();
-        $process->setJob($job);
-        
+    public function registerJob($job)
+    {
+        $process = new GenericProcess($job);
         $this->registerProcess($process);
         
         return $process;
     }
     
     public function registerProcess(ProcessInterface $process) {
+        $job = $process->getJob();
+        
+        if($job instanceof JobInterface) {
+            if(!$job instanceof SerializableJobInterace) {
+                throw new \RuntimeException("Job object can't be registered as it's not serializable");
+            }
+        }
+        else {
+            if(!$this->getJobManager()->has($job)) {
+                throw new \RuntimeException("Job '$job' is not registered with job manager");
+            }
+        }
+        
         $this->getRegistry()->register($process);
+        $this->getBus()->writeStdout($process->getId(), '');//init the bus
     }
 
     public function run($process) {
@@ -52,22 +66,25 @@ class Processor
             $process = $registry->get($process);
         }
         
-        $job = $process->getJob();
-        if(!$job instanceof JobInterface) {
-            throw new \Exception("Process has got no job. Can't run this!");
-        }
-        
         if($process->getStarted()) {
             throw new \Exception("Can't run process which has been started once");
         }
-                
-        $registry->start($process);
+        
+        $job = $process->getJob();
+        if(!$job instanceof SerializableJobInterace) {
+            $jobHandle = $job;
+            $job = $this->getJobManager()->get($jobHandle);
+            if(!$job instanceof JobInterface) {
+                throw new \Exception("Job '$jobHandle' is not registered with job manager");
+            }
+        }
+        
+        $process->setStarted(time());
+        $registry->store($process);
         $this->runningProcess = $process;
         
         //TODO - getter/setter
-        $processOutput = new GenericProcessOutput();
-        $processOutput->setProcess($process);
-        $processOutput->setProcessorBus($this->getBus());
+        $processOutput = new GenericProcessOutput($this, $process);
         
         //http://php.net/manual/en/function.ob-start.php
         //"Prior to PHP 5.4.0, the value 1 was a special case value that set the chunk size to 4096 bytes."
@@ -75,7 +92,8 @@ class Processor
         $job->run($processOutput);
         //ob_end_flush();
         
-        $registry->finish($process);
+        $process->setFinished(time());
+        $registry->store($process);
         $this->runningProcess = null;
     }
 
@@ -96,12 +114,6 @@ class Processor
         return $this->runningProcess;
     }
 
-    public function writeStdoutOutput($data)
-    {
-        $this->getProcessor()->writeStdout($this->getRunningProcess()->getId(), $data);
-        //return $data;
-    }
-    
     public function getMaxExecutionTime()
     {
         if($this->maxExecutionTime === null) {
@@ -141,4 +153,13 @@ class Processor
         $this->bus = $bus;
     }
     
+    public function getJobManager()
+    {
+        return $this->jobManager;
+    }
+
+    public function setJobManager($jobManager)
+    {
+        $this->jobManager = $jobManager;
+    }
 }

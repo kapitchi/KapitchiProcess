@@ -8,8 +8,6 @@
 
 namespace KapitchiProcess\Process;
 
-use KapitchiProcess\Job\JobInterface;
-
 /**
  * 
  * @author Matus Zeman <mz@kapitchi.com>
@@ -20,12 +18,22 @@ class GenericProcess implements ProcessInterface {
     protected $started;
     protected $finished;
     protected $registered;
+    protected $registry;
     
-    public function getJob() {
+    public function __construct($job = null)
+    {
+        if($job) {
+            $this->setJob($job);
+        }
+    }
+
+    public function getJob()
+    {
         return $this->job;
     }
 
-    public function setJob(JobInterface $job) {
+    public function setJob($job)
+    {
         $this->job = $job;
     }
 
@@ -61,4 +69,14 @@ class GenericProcess implements ProcessInterface {
         $this->finished = $finished;
     }
     
+    public function getRegistry()
+    {
+        return (array)$this->registry;
+    }
+
+    public function setRegistry(array $registry)
+    {
+        $this->registry = $registry;
+    }
+
 }

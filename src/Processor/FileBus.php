@@ -24,6 +24,10 @@ class FileBus implements BusInterface
     
     public function readStdout($pid, $offset = null) {
         $path = $this->getFilePath($pid);
+        if(!is_readable($path)) {
+            throw new \RuntimeException("Not readable bus '$path'");
+        }
+        
         if($offset === null) {
             return file_get_contents($path);
         }
