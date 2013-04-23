@@ -35,15 +35,15 @@ $process = $processor->registerJob(new \KapitchiProcess\Job\ShellJob('ping -n 30
 $pid = $process->getId();
 ```
 
-2. Run a process using separate AJAX request as to get response will take as long as your process will run
+2. Run a process using separate AJAX request as to get response will take as long as your process runs
 
 ```
 $processor->run($pid);
 ```
 
-3. Use /process/api/bus-reader/read-next/[pid] (AJAX every 1sec?) to request process updates in JSON format as example below.
+3. Use /process/api/bus-reader/read-next/[pid] (AJAX every 1sec?) to request process updates in JSON format as an example below.
 
-_Data_ contains data written by the process after the last update request only.
+_stdoutDelta_ contains data written by the process to "stdOut" after the last progress request only.
 
 ```
 {
@@ -53,7 +53,7 @@ _Data_ contains data written by the process after the last update request only.
     startedTime: 1366660603,
     runningTime: 24,
     registry: [ ],
-    data: "Reply from 176.74.179.134: bytes=32 time=415ms TTL=38 Reply from 176.74.179.134: bytes=32 time=416ms TTL=38 Reply from 176.74.179.134: bytes=32 time=415ms TTL=38 Reply from 176.74.179.134: bytes=32 time=416ms TTL=38 "
+    stdoutDelta: "Reply from 176.74.179.134: bytes=32 time=415ms TTL=38 Reply from 176.74.179.134: bytes=32 time=416ms TTL=38 Reply from 176.74.179.134: bytes=32 time=415ms TTL=38 Reply from 176.74.179.134: bytes=32 time=416ms TTL=38 "
 }
 ```
 

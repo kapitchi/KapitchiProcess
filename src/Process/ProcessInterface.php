@@ -11,6 +11,8 @@ namespace KapitchiProcess\Process;
 interface ProcessInterface {
     public function getJob();
     public function setJob($job);
+    public function setJobName($jobName);
+    public function getJobName();
     public function getId();
     public function setId($pid);
     public function getRegistered();

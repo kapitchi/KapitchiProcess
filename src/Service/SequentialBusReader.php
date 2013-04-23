@@ -52,7 +52,7 @@ class SequentialBusReader extends AbstractService
             'startedTime' => $started,
             'runningTime' => $executionTime,
             'registry' => $process->getRegistry(),
-            'data' => $data,
+            'stdoutDelta' => $data,
         );
     }
     

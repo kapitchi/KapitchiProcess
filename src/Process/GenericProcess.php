@@ -15,6 +15,7 @@ namespace KapitchiProcess\Process;
 class GenericProcess implements ProcessInterface {
     protected $id;
     protected $job;
+    protected $jobName;
     protected $started;
     protected $finished;
     protected $registered;
@@ -36,7 +37,17 @@ class GenericProcess implements ProcessInterface {
     {
         $this->job = $job;
     }
+    
+    public function getJobName()
+    {
+        return $this->jobName;
+    }
 
+    public function setJobName($jobName)
+    {
+        $this->jobName = $jobName;
+    }
+    
     public function getId() {
         return $this->id;
     }

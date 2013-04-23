@@ -21,7 +21,7 @@ class ShellJob implements JobInterface, SerializableJobInterace
         }
     }
     
-    public function run(ProcessOutputInterface $output) {
+    public function run(ProcessOutputInterface $output, $data) {
         $cmd = $this->getCommand();
         if(empty($cmd)) {
             throw new CommandEmptyException("Command is empty");
@@ -48,6 +48,10 @@ class ShellJob implements JobInterface, SerializableJobInterace
     public function setCommand($command) {
         $this->command = $command;
     }
-    
+
+    public function __toString()
+    {
+        return __CLASS__ . ': ' . $this->getCommand();
+    }
     
 }

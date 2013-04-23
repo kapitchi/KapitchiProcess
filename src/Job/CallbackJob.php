@@ -13,15 +13,24 @@ use KapitchiProcess\Process\ProcessOutputInterface;
 class CallbackJob implements JobInterface
 {
     protected $callbackHandler;
+    protected $name;
     
-    public function __construct($callback)
+    public function __construct($callback, $name = null)
     {
         $this->callbackHandler = new \Zend\Stdlib\CallbackHandler($callback);
+        $this->name = $name;
     }
             
-    public function run(ProcessOutputInterface $output)
+    public function run(ProcessOutputInterface $output, $data)
     {
-        $this->callbackHandler->call(array($output));
+        $this->callbackHandler->call(array($output, $data));
     }
 
+    public function __toString()
+    {
+        if($this->name) {
+            return __CLASS__ . ': ' . $this->name;
+        }
+        return __CLASS__;
+    }
 }

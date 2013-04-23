@@ -56,7 +56,7 @@ class Processor
         $this->getBus()->writeStdout($process->getId(), '');//init the bus
     }
 
-    public function run($process) {
+    public function run($process, $data) {
         if($this->runningProcess !== null) {
             throw new \Exception("Can't run multiple processes at the same time from same thread");
         }
@@ -79,6 +79,7 @@ class Processor
             }
         }
         
+        $process->setJobName($job->__toString());
         $process->setStarted(time());
         $registry->store($process);
         $this->runningProcess = $process;
@@ -89,7 +90,7 @@ class Processor
         //http://php.net/manual/en/function.ob-start.php
         //"Prior to PHP 5.4.0, the value 1 was a special case value that set the chunk size to 4096 bytes."
         //ob_start(array($this, 'writeStdoutOutput'), 2);
-        $job->run($processOutput);
+        $job->run($processOutput, $data);
         //ob_end_flush();
         
         $process->setFinished(time());
